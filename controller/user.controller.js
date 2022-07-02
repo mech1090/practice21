@@ -10,7 +10,21 @@ const getLoginForm = (req,res)=>{
 }
 
 const login = async(req,res)=>{
-    
+    const {email,password} = req.body
+    const fields = {email,password}
+    const {error,value} = userValidationSchema(fields)
+    if(error){
+        return res.render('login/layout',{message:error.details[0].message})
+    }
+    const findUser = await userService.getEmail({email})
+    if(!findUser){
+        return res.render('signup/layout',{message:'User not exist Signup'})
+    }
+    const matchPassword = await bcrypt.compare(password,findUser.password)
+    if(!matchPassword){
+        return res.render('login/layout',{message:'Credentials Wrong'})
+    }
+    return res.render('user/layout')
 
 }
 
